@@ -217,11 +217,26 @@ public:
 		
 		c = best;
 		double p,expP,deltaE;
-		double Temp = 1000000000;
 		
+		// Run at this initial temperature for test cases 1 through 5 and all example cases.
+		//double Temp = 1000000000; // 9 0s
+		
+		// Run at this initial temperature for test case 6.
+		// double Temp = 1000000; // 6 0s
+	
+		double Temp = 950000;
+
+		// Run at this for test cases 1 thru 5, all example cases.
+		// int numberOfIterations = 100000;
+
+		// Run at this for test case 6.
+		// int numberOfIterations = 50000;
+		
+		int numberOfIterations = 6000;
+
 		for (double T = Temp; T > 0.01; T*=0.5) 
 		{
-			for (int i = 0; i < 100000; i++) 
+			for (int i = 0; i < numberOfIterations; i++)
 			{
 				possibleSolution n = data.genRand(c);
 			
@@ -245,6 +260,8 @@ public:
 		
 		// Given our current best path, let's make it better.
 		twoOpt(); 
+		//calculatePathDistance();
+		
 	}
 
 	/* Given an initial optimal candidate solution from the Simulated Annealing algorithm, optimize further using the 2-Opt algorithm.
@@ -277,7 +294,8 @@ public:
 		}
 		while (changed); 
 
-		twoHalfOpt();
+		//twoHalfOpt();
+		calculatePathDistance();
 	}
 
 	// We've applied Two-Opt to our best path, now let's subject our path to a third optimizing algorithm. This time, we broaden our horizons from Two-Opt by not simply considering two sets of adjacent edges, but instead three edges where two are adjacent to each other and 1 is not. 
