@@ -13,6 +13,9 @@ Solutions for tsp_example_x are in tsp_example_x.txt.AlexHoffer.tour.
 Approaches:
 
 For test-input-x where x = [1,5]: Same as for all tsp_example_x.
+
 For all tsp_example_x: Run at a starting temperature of 1000000000 and at each temperature iteration run 100000 options.
+
 For test-input-x where x = 6: Run at a starting temperature of 1000000 and at each temperature iteration run 50000 options.
+
 For test-input-x where x = 7:
