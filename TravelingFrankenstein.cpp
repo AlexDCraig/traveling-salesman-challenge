@@ -23,6 +23,7 @@ string testOutputName;
 string* fileType;
 int* fileNumber;
 
+// Get the right initial temp for Sim. Annealing. If the input file is huge, reduce the initial temperature if it's a competition case so it can run in time.
 double getTemperature()
 {
 	long double Temp;
@@ -89,6 +90,7 @@ double getTemperature()
 
 }
 
+// Get the right number of iterations. Huge inputs require smaller iterations per temperature.
 int getIterations()
 {
 	long int numIterations;
@@ -115,7 +117,7 @@ int getIterations()
 		// Iterate this much for test case 6.
 		if (num == 6)	
 		{
-			numIterations = 50000;
+			numIterations = 25000;
 			cout << "Test case 6 given, at each temperature will run reduced number of iterations (" << numIterations << ") to save time" << endl;
 			return numIterations;
 		}
@@ -151,6 +153,7 @@ int getIterations()
 	}
 }
 
+// Holds data from the parsed text input file.
 class cityInformation 
 {
 public:
@@ -166,6 +169,7 @@ public:
 	cityInformation() 
 	{
 
+			// Parse given input file.
 			string line;
 			if (!inputFile)
 			{
@@ -235,6 +239,7 @@ public:
 		}
 	}
 
+	// Given the indices of two cities, compute the Euclidean distance between them.
 	int computeDistance(int idx1, int idx2)
 	{
 		int x1 = xCoordinates.at(idx1);
@@ -254,6 +259,7 @@ public:
 		return distance;
 	}
 
+	// Create a two-dimensional matrix that holds the distances between each point to each other point
 	void constructAdjacencyMatrix()
 	{
 		int max = cityNumbers.size();
@@ -270,11 +276,13 @@ public:
 		}
 	}
 
+	// Return a random value according to some range given by i.
 	static int myrandom (int i) 
 	{ 
 		return rand()%i;
 	}
 
+	// Generate a random tour solution.
 	possibleSolution genRand(possibleSolution C) 
 	{
 		int l,a,b,temp;
@@ -287,11 +295,13 @@ public:
 		return C;
 	}
 
+	// Discover the total cost of a possible solution tour.
 	double evaluate(possibleSolution C) 
 	{
 		return tourCost(C);
 	}
 
+	// Compute the total cost of a possible solution tour.
 	double tourCost(possibleSolution C) 
 	{
 		int l = C.size();
@@ -305,6 +315,7 @@ public:
 	}
 };
 
+// Implements Simulated Annealing, Two-Opt, Two-Half Opt algorithms
 class TravelingFrankenstein
 {
 public:
@@ -317,6 +328,7 @@ public:
 		minTour = 0.0;
 	} 
 
+	// Generate a random probability.
 	double randProb()
 	{
 		double p = (rand() / (RAND_MAX + 1.0));
@@ -327,13 +339,16 @@ public:
 	{
 		vector <int> V(data.N);
 		
+		// Initialize the vertices.
 		for (int i=0;i < data.N;i++) 
 			V[i] = i+1;
 
+		// Get an initial, random possible solution. It's the best one we know of right now.
 		possibleSolution c = data.genRand(V);
 		best = c;
 		minTour = data.tourCost(c);
 
+		// Randomly check the neighbors of the first possible solution, trying to find a shorter path.
 		for(int i=0;i<1000;i++) 
 		{
 			random_shuffle(c.begin(),c.end());
@@ -347,11 +362,14 @@ public:
 		}
 		
 		c = best;
+		
+		// Variables used to compute probability in the case of a tour being worse than the best current tour.
 		double p,expP,deltaE;
 		
 		double Temp = getTemperature();
 		int numberOfIterations = getIterations();
 
+		// Start at initial temperature. Go through each temperature numberOfIterations times. Select a random tour from the previous best tour and compute its distance.
 		for (double T = Temp; T > 0.01; T*=0.5) 
 		{
 			for (int i = 0; i < numberOfIterations; i++)
@@ -363,6 +381,7 @@ public:
 				p = 1 / (1+exp(-1*deltaE));
 				expP = randProb();
 				
+				// Do we take the random tour? We probalitistically chose to do so in this case.
 				if(expP < p) 	
 				{ 
 					c = n;
@@ -505,6 +524,7 @@ public:
 
 };
 
+// Check what file was used as input so we can adjust initial temperature, # of iterations correctly.
 void parseFileTitle(char* fileTitle)
 {
 	string fileT(fileTitle);
