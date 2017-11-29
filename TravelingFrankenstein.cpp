@@ -20,6 +20,137 @@ ofstream outputFile;
 string outputFileName;
 string testOutputName;
 
+string* fileType;
+int* fileNumber;
+
+double getTemperature()
+{
+	long double Temp;
+
+	if (*fileType == "test-input")
+	{
+		int num = *fileNumber;
+
+		// Run at this initial temp for test cases 1-4.
+		if (num == 1 || num == 2 || num == 3 || num == 4)
+		{
+			Temp = 1000000000; 
+			cout << "Test case " << num << " given, running Simulated Annealing with initial temperature of " << Temp << endl;
+			return Temp;
+		}
+
+		if (num == 5)
+		{
+			Temp = 100000000;
+			cout << "Test case " << num << " given, running Simulated Annealing with reduced initial temperature of " << Temp << " to save time " << endl;
+			return Temp;
+		}
+	
+		// Run at this initial temp for test case 6.
+		if (num == 6)	
+		{
+			Temp = 1000000;
+			cout << "Test case " << num << " given, running Simulated Annealing with reduced initial temperature of " << Temp << " to save time " << endl;
+			return Temp;
+		}
+
+		// Run at this initial temp for test case 7.
+		if (num == 7)
+		{
+			Temp = 950000;
+			cout << "Test case " << num << " given, running Simulated Annealing with reduced initial temperature of " << Temp << " to save time " << endl;
+			return Temp;
+		}
+
+		// Handle other input.
+		else 
+		{
+			Temp = 1000000000;
+			cout << "Test case " << num << " given, running Simulated Annealing with initial temperature of " << Temp << endl;
+			return Temp;
+		}
+	}
+
+	// Run at this temperature for all example cases.
+	else if (*fileType == "tsp_example")
+	{
+		cout << "Tsp_example file given, running Simulated Annealing with initial temperature of 1000000000" << endl;
+		Temp = 1000000000; 
+		return Temp;
+	}
+
+	// Handle other input.
+	else
+	{
+		Temp = 1000000000;
+		cout << "Running Simulated Annealing at initial temperature of " << Temp << endl;
+		return Temp;
+	}
+
+}
+
+int getIterations()
+{
+	long int numIterations;
+
+	if (*fileType == "test-input")
+	{
+		int num = *fileNumber;
+
+		// Iterate this much for test cases 1-4.
+		if (num == 1 || num == 2 || num == 3 || num == 4)
+		{
+			numIterations = 100000;
+			cout << "Test case " << num << " given, at each temperature will run " << numIterations << " iterations" << endl;
+			return numIterations;
+		}
+
+		if (num == 5)
+		{
+			numIterations = 75000;
+			cout << "Test case " << num << " given, at each temperature will run reduced number of iterations (" << numIterations << ") to save time" << endl;
+			return numIterations;
+		}
+	
+		// Iterate this much for test case 6.
+		if (num == 6)	
+		{
+			numIterations = 50000;
+			cout << "Test case 6 given, at each temperature will run reduced number of iterations (" << numIterations << ") to save time" << endl;
+			return numIterations;
+		}
+
+		// Iterate this much for test case 7.
+		if (num == 7)
+		{
+			numIterations = 6000;
+			cout << "Test case 7 given, at each temperature will run reduced number of iterations (" << numIterations << ") to save time" << endl;
+			return numIterations;
+		}
+
+		// If there's some other input we don't know about, just go with the default.
+		numIterations = 100000;
+		cout << "At each temperature, running " << numIterations << " iterations." << endl;
+		return numIterations;
+	}
+
+	// Iterate this many times per temp for all example cases.
+	else if (*fileType == "tsp_example")
+	{
+		numIterations = 100000;
+		cout << "Tsp_example given, at each temperature will run " << numIterations << " iterations." << endl;
+		return numIterations;
+	}
+
+	// Handle other input.
+	else
+	{
+		numIterations = 100000;
+		cout << "At each temperature, running " << numIterations << " iterations." << endl;
+		return numIterations;
+	}
+}
+
 class cityInformation 
 {
 public:
@@ -218,21 +349,8 @@ public:
 		c = best;
 		double p,expP,deltaE;
 		
-		// Run at this initial temperature for test cases 1 through 5 and all example cases.
-		//double Temp = 1000000000; // 9 0s
-		
-		// Run at this initial temperature for test case 6.
-		// double Temp = 1000000; // 6 0s
-	
-		double Temp = 950000;
-
-		// Run at this for test cases 1 thru 5, all example cases.
-		// int numberOfIterations = 100000;
-
-		// Run at this for test case 6.
-		// int numberOfIterations = 50000;
-		
-		int numberOfIterations = 6000;
+		double Temp = getTemperature();
+		int numberOfIterations = getIterations();
 
 		for (double T = Temp; T > 0.01; T*=0.5) 
 		{
@@ -259,8 +377,8 @@ public:
 		}
 		
 		// Given our current best path, let's make it better.
+		cout << "Using TwoOpt algorithm on Simulated Annealing result." << endl;
 		twoOpt(); 
-		//calculatePathDistance();
 		
 	}
 
@@ -294,8 +412,20 @@ public:
 		}
 		while (changed); 
 
-		//twoHalfOpt();
-		calculatePathDistance();
+		if (*fileType == "test-input")
+		{
+			if (*fileNumber == 7)
+			{
+				cout << "Test input file 7 given. Skipping 2.5-Opt to save time." << endl;
+				calculatePathDistance();
+			}
+		}
+
+		else
+		{
+			cout << *fileType << "Commencing 2.5-Opt algorithm." << endl;
+			twoHalfOpt();
+		}
 	}
 
 	// We've applied Two-Opt to our best path, now let's subject our path to a third optimizing algorithm. This time, we broaden our horizons from Two-Opt by not simply considering two sets of adjacent edges, but instead three edges where two are adjacent to each other and 1 is not. 
@@ -375,8 +505,41 @@ public:
 
 };
 
+void parseFileTitle(char* fileTitle)
+{
+	string fileT(fileTitle);
+	int lastIndex = fileT.find_first_of('.');
+	string fileName = fileT.substr(0, lastIndex);
+	
+	if (fileName.find("test-input") != std::string::npos)
+	{
+		string title1 = "test-input";
+		fileType = new string;
+		*fileType = title1;
+
+		int indexBefore = fileName.find('-', 5);  
+		char fileNumInChar = fileName[indexBefore+1];
+		int fileNumInInt = fileNumInChar - '0';
+		
+		fileNumber = new int;
+		*fileNumber = fileNumInInt;
+	}
+
+	else if (fileName.find("tsp_example") != std::string::npos)
+	{
+		string title2 = "tsp_example";
+		fileType = new string;
+		*fileType = title2;
+	}
+}
+
 int main(int argc, char* argv[]) 
 {
+	fileType = NULL;
+	fileNumber = NULL;
+
+	parseFileTitle(argv[1]);
+
 	ofstream testOutput;
 	clock_t t;
 	t = clock();
