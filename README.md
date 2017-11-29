@@ -2,6 +2,10 @@
 # Key Files:
 TravelingFrankenstein.cpp -- A C++ file that uses the Simulated Annealing algorithm to generate an initial best path, which is then improved upon by the Two-Opt heuristic and then the 2.5-Opt heuristic. 
 
+To Compile and Run:
+1. Compile by entering: g++ TravelingFrankenstein.cpp -o TravelingFrankenstein
+2. Run code on desired file by entering: ./TravelingFrankenstein [insert filename]
+
 test-input-x, where x = [1,7] -- Test cases provided by my instructor that need to finish before three minutes has elapsed.
 
 tsp_example_x, where x = [1,3] -- Test cases that must be optimal within a 1.25 bound of the optimal solution. No running time requirement.
